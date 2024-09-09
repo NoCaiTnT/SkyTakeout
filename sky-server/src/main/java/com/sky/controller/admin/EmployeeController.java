@@ -119,4 +119,32 @@ public class EmployeeController {
         employeeService.changeEmployeeStatus(status, id);
         return Result.success();
     }
+
+    /**
+     * 根据 id 查询员工信息
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation(value = "根据 id 查询员工信息")          // Swagger注解
+    public Result<Employee> srarchEmployeeByID(@PathVariable("id") Long id) {
+        log.info("员工查询，id：{}", id);
+        Employee employee = employeeService.searchEmployeeByID(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 修改员工信息
+     *
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping("")
+    @ApiOperation(value = "修改员工信息")          // Swagger注解
+    public Result changeEmployeeInfo(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("修改员工信息：{}", employeeDTO);
+        employeeService.changeEmployeeInfo(employeeDTO);
+        return Result.success();
+    }
 }

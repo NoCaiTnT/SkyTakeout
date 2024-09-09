@@ -38,4 +38,12 @@ public interface EmployeeMapper {
      * @param employee
      */
     void updateEmployee(Employee employee);
+
+    /**
+     * 根据 id 查询员工信息
+     * @param id
+     * @return
+     */
+    @Select("select * from employee where id = #{id}")  // 表列名和类变量名不完全一致，MyBatis有自动映射功能
+    Employee searchEmployeeByID(Long id);
 }
