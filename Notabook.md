@@ -27,6 +27,8 @@
 
 1. 需求描述
 
+添加员工信息
+
 | 字段   | 需求        |
 |------|-----------|
 | 账号   | 唯一        |
@@ -63,8 +65,8 @@
 | 名称   | 类型      | 是否必须  | 默认值 | 备注   | 其他信息 |
 |------|---------|-------|-----|------|------|
 | code | integer | 必须   |     | 状态码  |      |
-| data | object  | 非必须    |     | 返回数据 |   |
 | msg  | string  | 非必须    |     | 错误信息 |      |
+| data | object  | 非必须    |     | 返回数据 | 不需要  |
 
 3. 错误处理
 
@@ -82,4 +84,58 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - public void set (T value)：设置当前线程的线程局部变量的值 -- 加
 - public T get ()：返回当前线程的线程局部变量的值  -- 获得
 - public void remove ()：移除当前线程的线程局部变量的值  -- 删
+</details>
+
+<details>
+<summary> 3. 员工分页查询 </summary>
+
+1. 需求描述
+- 根据页码展示员工信息
+- 每页展示 10 条数据
+- 分页查询时可以根据需要，输入员工姓名进行查询
+
+2. 接口信息
+
+（1）基本信息
+- path：/admin/employee/page
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称       | 类型      | 是否必须  | 默认值 | 备注    | 其他信息 |
+|----------|---------|-------|-----|-------|------|
+| name     | string  | 非必须   |     | 员工姓名  |      |
+| page     | integer | 必须    |     | 页码    |   |
+| pageSize | integer | 必须    |     | 每页记录数 |      |
+
+（3）返回数据
+
+| 名称                                | 类型       | 是否必须  | 默认值 | 备注         | 其他信息 |
+|-----------------------------------|----------|-------|-----|------------|------|
+| code                              | integer  | 必须   |     | 状态码        |      |
+| msg                               | string   | 非必须    |     | 每页记录数      |   |
+| data                              | object   | 必须    |     | 错误信息       |      |
+| &emsp;\|-- total                  | integer  | 必须    |     | 总页数        |      |
+| &emsp;\|-- records                | object[] | 必须    |     | 当前页的所有员工数据 |      |
+| &emsp;&emsp;&emsp;\|-- id         | integer  | 必须    |     | 员工 id      |      |
+| &emsp;&emsp;&emsp;\|-- username   | string   | 必须    |     | 用户名        |      |
+| &emsp;&emsp;&emsp;\|-- name       | string   | 必须    |     | 姓名         |      |
+| &emsp;&emsp;&emsp;\|-- password   | string   | 必须    |     | 密码         |      |
+| &emsp;&emsp;&emsp;\|-- phone      | string   | 必须    |     | 电话号        |      |
+| &emsp;&emsp;&emsp;\|-- sex        | string   | 必须    |     | 性别         |      |
+| &emsp;&emsp;&emsp;\|-- idNumber   | string   | 必须    |     | 身份证号       |      |
+| &emsp;&emsp;&emsp;\|-- status     | integer  | 必须    |     | 账号状态       |      |
+| &emsp;&emsp;&emsp;\|-- createTime | string   | 必须    |     | 创建时间       |      |
+| &emsp;&emsp;&emsp;\|-- updateTime | string   | 必须    |     | 更新时间       |      |
+| &emsp;&emsp;&emsp;\|-- createUser | integer   | 必须    |     | 创建者的 id    |      |
+| &emsp;&emsp;&emsp;\|-- updateUser | integer   | 必须    |     | 修改者的 id    |      |
+
+3. 错误处理
+
+日期返回格式错误
+- 使用 @JsonFormat 注解格式化日期变量
+- 在 WebMvcConfiguration 中扩展 Spring MVC 的消息转换器，统一对日期类型进行格式化处理
+  - 需要自己定一个 日期转换 的消息转换器，将其加入到系统的消息转换器列表中
+
 </details>
