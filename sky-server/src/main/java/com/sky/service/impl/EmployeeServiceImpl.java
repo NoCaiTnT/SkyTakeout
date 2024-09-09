@@ -101,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return
      */
     public PageResult searchEmployee(EmployeePageQueryDTO employeePageQueryDTO) {
+        // select * from employee where name like ... limit 0,10
         // 开始分页查询，该包用于拼接 SQL 语句：limit 0,10，即从第0条开始，查询10条，动态拼接
         // 该方法会先查询 total 总数，然后再查询结果
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
@@ -111,6 +112,25 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 封装结果
         PageResult pageResult = new PageResult(page.getTotal(), page.getResult());
         return pageResult;
+    }
+
+    /**
+     * 启用 & 禁用员工账号
+     *
+     * @param status
+     * @param id
+     */
+    public void changeEmployeeStatus(Integer status, Long id){
+        // update employee set status = ? where id = ?
+
+        // 构建员工对象
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+
+        // 更新
+        employeeMapper.updateEmployee(employee);
     }
 
 }

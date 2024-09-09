@@ -104,4 +104,19 @@ public class EmployeeController {
         PageResult pageResult = employeeService.searchEmployee(employeePageQueryDTO);
         return Result.success(pageResult);
     }
+
+    /**
+     * 启用 & 禁用员工账号
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation(value = "启用 & 禁用员工账号")          // Swagger注解
+    public Result changeEmployeeStatus(@PathVariable("status") Integer status, Long id) {
+        log.info("启用 & 禁用员工账号，status：{}，id：{}", status, id);
+        employeeService.changeEmployeeStatus(status, id);
+        return Result.success();
+    }
 }
