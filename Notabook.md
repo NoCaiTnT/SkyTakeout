@@ -285,3 +285,34 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 | data                  | object   | 非必须    |     | 返回数据         |      |
 
 </details>
+
+<details>
+
+<summary> 6. 菜品分类 </summary>
+
+1. 需求描述
+- 分类名称必须 唯一
+- 分类类型为：菜品分类 和 套餐分类
+- 新添加的分类状态默认为 禁用（新分类无菜品，禁用 不让在应用端展示）
+
+2. 接口信息
+- 新增分类
+  - path：/admin/category
+  - method：POST
+- 分类分页查询
+  - path：/admin/category/page
+  - method：GET
+- 根据 id 删除分类
+  - path：/admin/category
+  - method：DELETE
+- 修改分类
+  - path：/admin/category
+  - method：PUT
+- 启用 & 禁用分类
+  - path：/admin/category/status/{status}
+  - method：POST
+- 根据类型查询
+  - path：/admin/category/list
+  - method：GET
+
+</details>
