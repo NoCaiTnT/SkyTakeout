@@ -316,3 +316,60 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - method：GET
 
 </details>
+
+<details>
+
+<summary> 7. 公共字段自动填充 </summary>
+
+1. 需求描述
+
+业务表中有许多公共（重复）的字段
+
+| 名称         | 类型       | 含义   | 操作类型          |
+|---------------------|----------|------|---------------|
+| create_time | datetime | 创建时间 | insert        |
+| create_user | bigint   | 创建者  | insert        |
+| update_time | datetime | 修改时间 | insert、update |
+| update_user | bigint   | 修改者  | insert、update  |
+
+
+这种重复的字段导致业务代码需要重复编写，十分冗余，不利于后期维护
+
+因此需要一种手段来进行统一的操作
+
+2. 实现方式
+- 使用 切面 拦截 Mapper，统一对公共字段进行赋值
+- 自定义注解 AutoFill，用于标识需要进行公共字段自动填充的方法
+- 自定义切面类 AutoFillAspect，统一拦截加入了 AutoFill 注解的方法，通过反射为公共字段赋值
+- 在 Mapper 的方法上加入 AutoFill 注解
+- 技术点：枚举、注解、AOP、反射
+
+3. 具体实现
+
+（1）创建 AutoFill 注解
+- com.sky.annotation/Autofill
+
+（2）创建 AutoFillAspect 切面类
+- com.sky.aspect/AutoFillAspect
+- 切入点
+  - 定义切入点 Pointcut：@Pointcut("execution(* com.sky.mapper.*.*(..))")
+  - 拦截 Mapper 包下所有类的所有方法（.*.*），参数是任意参数（..），返回值是任意返回值（*）
+  - 此外：该包下的查询 & 删除不需要拦截，因此需要设定只拦截带有 @AutoFill 注解的方法
+  - 需要加入：@annotation(com.sky.annotation.AutoFill)
+  - 整体：@Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotation.AutoFill)")
+- 通知-参数
+  - 需要 前缀通知，在插入 & 更新前进行赋值
+  - 指定切入点：即切入点的函数名
+  - @Before("autoFillPointcut()")
+  - 参数：JoinPoint，被拦截方法的信息
+- 通知-实现
+  - 获取拦截到的数据块操作类型：insert or update
+    - 更新操作不用改变 创建时间 和 创建者
+  - 获得拦截到的方法的参数，即实体对象，这样才能对它赋值
+    - 默认方法的第一个参数为所需的实体对象
+  - 准备公共字段赋值的数据
+  - 根据操作类型，通过 反射 赋值
+    - 先获得实体的 set 方法，定义了常量字段
+    - 然后调用 set 方法进行赋值
+
+</details>
