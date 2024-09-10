@@ -373,3 +373,131 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
     - 然后调用 set 方法进行赋值
 
 </details>
+
+<details>
+
+<summary> 8. 新增菜品 </summary>
+
+1. 需求描述
+
+添加菜品信息
+
+| 字段     | 需求       |
+|--------|----------|
+| 菜品名称   | 唯一       |
+| 菜品分类   |        |
+| 菜品价格   |  |
+| 口味做法配置 |    |
+| 菜品图片   |        |
+| 菜品描述   |    |
+
+业务规则：
+- 菜品名唯一
+- 菜品必须属于某个分类，不能单独存在
+- 新增菜品时可以根据情况选择菜品的口味
+- 每个菜品必须对应一张图片
+
+接口设计：
+- 查询菜品分类
+- 文件上传（图片）
+- 新增菜品
+
+2. 接口信息
+- 根据类型查询分类
+  - 在 6. 菜品分类中已经实现
+
+- 文件上传
+
+（1）基本信息
+- path：/admin/common/upload
+- method：POST
+
+（2）请求参数
+- Headers
+
+| 名称         | 参数值                 | 是否必须 | 示例 | 备注    |
+|------------|---------------------|------|----|-------|
+| Content-Type | multipart/form-data | 必须   |    |   |
+
+- Body
+
+| 名称   | 类型   | 是否必须  | 默认值 | 备注 | 其他信息 |
+|------|------|-------|-----|----|------|
+| file | file | 必须    |     | 文件 |      |
+
+
+（3）返回数据
+
+| 名称                   | 类型       | 是否必须  | 默认值 | 备注     | 其他信息 |
+|-----------------------|----------|-------|-----|--------|------|
+| code                  | integer  | 必须   |     | 状态码    |      |
+| msg                   | string   | 非必须    |     | 错误信息   |   |
+| data                  | object   | 必须    |     | 文件上传路径 |      |
+
+- 新增菜品
+
+（1）基本信息
+- path：/admin/dish
+- method：POST
+
+（2）请求参数
+- Headers
+
+| 名称         | 参数值              | 是否必须 | 示例 | 备注    |
+|------------|------------------|------|----|-------|
+| Content-Type | application/json | 必须   |    |   |
+
+- Body
+
+| 名称                | 类型       | 是否必须 | 默认值 | 备注             | 其他信息 |
+|-------------------|----------|------|-----|----------------|------|
+| categoryid        | integer  | 必须   |     | 分类 id          |      |
+| description       | string   | 非必须  |     | 菜品描述           |      |
+| flavors           | object[] | 非必须   |     | 口味             |      |
+| &emsp;\|-- dishid | integer  | 非必须   |     | 菜品 id          |      |
+| &emsp;\|-- id     | integer  | 非必须   |     | 口味 id          |      |
+| &emsp;\|-- name   | string   | 必须   |     | 口味名称           |      |
+| &emsp;\|-- value  | string   | 必须   |     | 口味值            |      |
+| id                | integer  | 非必须   |     | 菜品 id          |      |
+| image             | string   | 必须   |     | 菜品图片路径         |      |
+| name              | string   | 必须   |     | 菜品名称           |      |
+| price             | float    | 必须   |     | 菜品价格           |      |
+| status            | integer  | 非必须   |     | 菜品状态：1为起售，0为停售 |      |
+
+
+（3）返回数据
+
+| 名称                   | 类型       | 是否必须  | 默认值 | 备注    | 其他信息 |
+|-----------------------|----------|-------|-----|-------|------|
+| code                  | integer  | 必须   |     | 状态码   |      |
+| msg                   | string   | 非必须    |     | 错误信息  |   |
+| data                  | object   | 非必须    |     | 返回数据  |      |
+
+3. 具体实现
+
+（1）文件上传
+- 新增 CommonController 
+- 配置阿里云OSS服务 application.yml/application-dev.yml
+- 创建配置类，配置服务信息 OssConfiguration 
+  - 在程序运行的时候创建一个配置类对象：使用 @Bean 和 @ConditionalOnMissingBean
+- 在 CommonController 中使用 @Autowired 来获取这个对象
+- 调用 AliOssUtils 中的上传方法，进行上传，并获得路径
+
+（2）新增菜品
+- 新增 DishController
+- 新增菜品相关服务 DishService，以及其实现类 DishServiceImpl
+- 在 菜品表 中添加菜品时，还需要在口味表中进行添加，调用 DishMapper
+  - 因此创建添加方法 addDishAndFlavor
+  - 开启 事务 保证一致性：@Transactional
+  - 需要在 SkyApplication 中开启注解方式的事务管理
+- 在 DishMapper 中新增 添加菜品 函数
+  - 使用公共字段填充 @AutoFill
+- 新增 DishMapper.xml 文件，实现上述函数
+  - 需要获得该菜品自动生成的 id：使用 useGeneratedKeys="true"
+  - 将该 id 赋值给 实体对象 Dish 中的 id 字段：使用 keyProperty="id"
+- 新增 DishFlavorMapper 对口味表进行操作，添加 @Mapper 注解
+  - 定义批量添加口味方法：addBatchFlavor
+- 新增 DishFlavorMapper.xml 文件，实现上述函数
+  - 使用 foreach 进行遍历列表
+
+</details>
