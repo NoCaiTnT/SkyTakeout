@@ -576,11 +576,11 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 （3）返回数据
 
-| 名称                                  | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
-|-------------------------------------|------------|------|-----|------------|------|
-| code                                | integer    | 必须   |     | 状态码        |      |
-| msg                                 | string     | 非必须  |     | 错误信息       |   |
-| data                                | object     | 非必须   |     | 返回数据       |      |
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------------------|------------|------|-----|------------|------|
+| code                          | integer    | 必须   |     | 状态码        |      |
+| msg                           | string     | 非必须  |     | 错误信息       |   |
+| data                          | object     | 非必须   |     | 返回数据       |      |
 
 3. 具体实现
 - 涉及的表
@@ -592,5 +592,90 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 新增 SetmealDishMapper.xml 并编写动态 sql 语句
   - 使用 foreach 进行遍历，使用 open 和 close 在遍历前后加上括号
 - 使用事务注解保证一致性：@Transactional
+
+</details>
+
+<details>
+
+<summary> 11. 修改菜品 </summary>
+
+1. 需求分析
+- 菜品信息的回显
+- 菜品分类的查询（已实现）
+- 文件上传（已实现）
+- 修改菜品
+
+2. 接口信息
+- 根据 id 查询数据
+（1）基本信息
+- path：/admin/dish/{id}
+- method：GET
+
+（2）请求参数
+- 路径参数
+
+| 名称 | 类型      | 是否必须 | 默认值 | 备注    | 其他信息  |
+|----|---------|------|-----|-------|-------|
+| id | integer | 必须   |     | 菜品 id |  |
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------------------|------------|------|-----|------------|------|
+| code                          | integer    | 必须   |     | 状态码        |      |
+| msg                           | string     | 非必须  |     | 错误信息       |   |
+| data                          | object     | 非必须   |     | 返回数据       |      |
+| &emsp;\|-- categoryId         | integer    | 非必须   |     | 菜品类别 id    |      |
+| &emsp;\|-- description        | string     | 非必须  |     | 菜品描述       |      |
+| &emsp;\|-- flavors            | object[]   | 非必须  |     | 当前页的所有员工数据 |      |
+| &emsp;&emsp;&emsp;\|-- dishId | integer    | 非必须   |     | 菜品 id      |      |
+| &emsp;&emsp;&emsp;\|-- id     | integer    | 非必须   |     | 菜品名称       |      |
+| &emsp;&emsp;&emsp;\|-- name   | string     | 非必须   |     | 价格         |      |
+| &emsp;&emsp;&emsp;\|-- value  | string     | 非必须   |     | 图片路径       |      |
+| &emsp;\|-- id                 | integer    | 非必须  |     | 菜品 id      |      |
+| &emsp;\|-- image              | string     | 非必须  |     | 菜品图像       |      |
+| &emsp;\|-- name               | string     | 非必须  |     | 菜品名        |      |
+| &emsp;\|-- price              | bigdecimal | 非必须  |     | 菜品价格       |      |
+
+- 修改菜品
+
+（1）基本信息
+- path：/admin/dish
+- method：PUT
+
+（2）请求参数
+- Headers
+
+| 名称           | 类型               | 是否必须 | 默认值 | 备注    | 其他信息  |
+|--------------|------------------|------|-----|-------|-------|
+| Content-Type | applocation/json | 必须   |     |  |  |
+
+- Body
+
+| 名称                | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------|------------|----|-----|------------|------|
+| categoryId        | integer    | 必须 |     | 菜品类别 id    |      |
+| description       | string     | 非必须 |     | 菜品描述       |      |
+| flavors           | object[]   | 非必须 |     | 当前页的所有员工数据 |      |
+| &emsp;\|-- dishId | integer    | 必须 |     | 菜品 id      |      |
+| &emsp;\|-- id     | integer    | 必须 |     | 菜品名称       |      |
+| &emsp;\|-- name   | string     | 必须 |     | 价格         |      |
+| &emsp;\|-- value  | string     | 必须 |     | 图片路径       |      |
+| id                | integer    | 必须 |     | 菜品 id      |      |
+| image             | string     | 必须 |     | 菜品图像       |      |
+| name              | string     | 必须 |     | 菜品名称       |      |
+| price             | bigdecimal | 必须 |     | 菜品价格       |      |
+| status            | integer    | 必须 |     | 菜品状态       |      |
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------------------|------------|------|-----|------------|------|
+| code                          | integer    | 必须   |     | 状态码        |      |
+| msg                           | string     | 非必须  |     | 错误信息       |   |
+| data                          | object     | 非必须   |     | 返回数据       |      |
+
+3. 具体实现
+
 
 </details>
