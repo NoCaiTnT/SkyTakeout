@@ -501,3 +501,12 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - 使用 foreach 进行遍历列表
 
 </details>
+
+<details>
+
+<summary> 9. 菜品分配查询 </summary>
+
+1. 需求分析
+- 
+
+</details>
