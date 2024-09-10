@@ -449,20 +449,20 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 - Body
 
-| 名称                | 类型       | 是否必须 | 默认值 | 备注             | 其他信息 |
-|-------------------|----------|------|-----|----------------|------|
-| categoryid        | integer  | 必须   |     | 分类 id          |      |
-| description       | string   | 非必须  |     | 菜品描述           |      |
-| flavors           | object[] | 非必须   |     | 口味             |      |
-| &emsp;\|-- dishid | integer  | 非必须   |     | 菜品 id          |      |
-| &emsp;\|-- id     | integer  | 非必须   |     | 口味 id          |      |
-| &emsp;\|-- name   | string   | 必须   |     | 口味名称           |      |
-| &emsp;\|-- value  | string   | 必须   |     | 口味值            |      |
-| id                | integer  | 非必须   |     | 菜品 id          |      |
-| image             | string   | 必须   |     | 菜品图片路径         |      |
-| name              | string   | 必须   |     | 菜品名称           |      |
-| price             | float    | 必须   |     | 菜品价格           |      |
-| status            | integer  | 非必须   |     | 菜品状态：1为起售，0为停售 |      |
+| 名称                | 类型         | 是否必须 | 默认值 | 备注             | 其他信息 |
+|-------------------|------------|------|-----|----------------|------|
+| categoryid        | integer    | 必须   |     | 分类 id          |      |
+| description       | string     | 非必须  |     | 菜品描述           |      |
+| flavors           | object[]   | 非必须   |     | 口味             |      |
+| &emsp;\|-- dishid | integer    | 非必须   |     | 菜品 id          |      |
+| &emsp;\|-- id     | integer    | 非必须   |     | 口味 id          |      |
+| &emsp;\|-- name   | string     | 必须   |     | 口味名称           |      |
+| &emsp;\|-- value  | string     | 必须   |     | 口味值            |      |
+| id                | integer    | 非必须   |     | 菜品 id          |      |
+| image             | string     | 必须   |     | 菜品图片路径         |      |
+| name              | string     | 必须   |     | 菜品名称           |      |
+| price             | bigdecimal | 必须   |     | 菜品价格           |      |
+| status            | integer    | 非必须   |     | 菜品状态：1为起售，0为停售 |      |
 
 
 （3）返回数据
@@ -507,6 +507,46 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 <summary> 9. 菜品分配查询 </summary>
 
 1. 需求分析
-- 
+- 根据页码展示菜品信息
+- 每页展示 10 条数据
+- 分页查询时，可以输入菜品名称、菜品分类、菜品状态进行查询
+
+2. 接口信息
+
+（1）基本信息
+- path：/admin/dish/page
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称         | 类型      | 是否必须 | 默认值 | 备注     | 其他信息 |
+|------------|---------|------|-----|--------|------|
+| page       | integer | 必须   |     | 页码     |   |
+| pageSize   | integer | 必须   |     | 每页记录数  |      |
+| name       | string  | 非必须  |     | 菜品名称   |      |
+| categoryId | integer | 非必须   |     | 分类 id  |      |
+| status     | integer | 非必须   |     | 菜品售卖状态 |      |
+
+（3）返回数据
+
+| 名称                                  | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------------------------|------------|------|-----|------------|------|
+| code                                | integer    | 必须   |     | 状态码        |      |
+| msg                                 | string     | 非必须  |     | 错误信息       |   |
+| data                                | object     | 必须   |     | 返回数据       |      |
+| &emsp;\|-- total                    | integer    | 必须   |     | 总页数        |      |
+| &emsp;\|-- records                  | object[]   | 非必须  |     | 当前页的所有员工数据 |      |
+| &emsp;&emsp;&emsp;\|-- id           | integer    | 必须   |     | 菜品 id      |      |
+| &emsp;&emsp;&emsp;\|-- name         | string     | 必须   |     | 菜品名称       |      |
+| &emsp;&emsp;&emsp;\|-- price        | bigdecimal | 必须   |     | 价格         |      |
+| &emsp;&emsp;&emsp;\|-- image        | string     | 必须   |     | 图片路径       |      |
+| &emsp;&emsp;&emsp;\|-- description  | string     | 必须   |     | 菜品描述       |      |
+| &emsp;&emsp;&emsp;\|-- status       | integer    | 必须   |     | 菜品售卖状态     |      |
+| &emsp;&emsp;&emsp;\|-- updateTime   | string     | 必须   |     | 更新时间       |      |
+| &emsp;&emsp;&emsp;\|-- categoryName | string     | 必须   |     | 分类名称       |      |
+
+3. 具体实现
+- 在 xml 文件中写的查询语句，需要连表查询，字段名需要一一对应，因此在 sql 语句中需要给字段起别名
 
 </details>
