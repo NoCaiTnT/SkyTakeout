@@ -179,6 +179,31 @@ fieId 和 value 都是字符串
 
 </details>
 
+## HttpClient
+用于构造、发送 Http 请求，在 Java 中以代码方式发送 Http 请求
+- 案例在 sky-server 的 test/HttpClientTest 中
+- 已经封装在了 sky-common 中的 HttpClientUtils 中
+- 将 Httpclient 坐标导入到 Maven 中
+  - 使用的阿里云 OSS 包，已经包含了 HttpClient，不用再导入了
+- 发送请求的步骤
+  - 创建 HttpClient 对象
+    - 使用 HttpClients 进行创建，返回 CloseableHttpClient 对象
+  - 创建 Http 请求对象
+    - 创建 HttpGet 对象，传入请求地址
+    - 可选：构造 StringEntity 对象传参，参数为 json 格式的字符串，并制定实体的编码方式（urf-8）和数据格式（json）
+    - 使用 JSONObject 对象构造 json 格式的字符串
+  - 调用 HttpClient 的 execute 方法发送请求
+    - 返回 CloseableHttpResponse 对象
+- 解析请求
+  - 获得状态码
+    - 使用 response.getStatusLine().getStatusCode()
+  - 获得返回数据
+    - 获取实体：response.getEntity()
+    - 获取 String 类型的数据：EntityUtils.toString(entity);
+- 关闭资源
+  - 关闭 CloseableHttpResponse 对象 response
+  - 关闭 CloseableHttpClient 对象
+
 ## 需求分析
 <details>
 <summary>1. JWT令牌</summary>
@@ -901,5 +926,204 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 3. 具体实现
 - 使用 Redis 进行存储
   - 1为营业，0为打烊
+
+</details>
+
+<details>
+
+<summary> 13. 微信登录 </summary>
+
+1. 需求分析
+- 基于微信登录实现小程序的登录功能
+- 如果是新用户需要自动完成注册
+
+2. 接口信息
+
+（1）基本信息
+- path：/user/user/login
+- method：POST
+
+（2）请求参数
+- Headers
+
+| 名称           | 类型               | 是否必须 | 描述 |
+|--------------|------------------|------|-----|
+| Content-Type | application/json | 必须   |     |
+
+- 路径参数
+
+| 名称   | 类型     | 是否必须 | 默认值 | 备注       | 其他信息  |
+|------|--------|------|-----|----------|-------|
+| code | string | 必须   |     | 微信用户的授权码 |  |
+
+（3）返回数据
+
+| 名称                | 类型         | 是否必须 | 默认值 | 备注        | 其他信息 |
+|-------------------|------------|------|-----|-----------|------|
+| code              | integer    | 必须   |     | 状态码       |      |
+| msg               | string     | 非必须  |     | 错误信息      |   |
+| data              | object     | 必须   |     | 返回数据      |      |
+| &emsp;\|-- id     | integer    | 必须 |     | 用户 id     |      |
+| &emsp;\|-- openid | string     | 必须 |     | 微信 openid |      |
+| &emsp;\|-- token  | string     | 必须 |     | jwt 令牌    |      |
+
+3. 具体实现
+- 配置微信登录所需的配置项
+  - 在 applocation.yml 和 applocation-dev.yml 新增代码
+  - 填入 appid 和 secret
+- 为用户端配置 jwt 令牌相关信息
+  - 在 applocation.yml 新增代码
+  - 填入 jwt 的 secret、过期时间、token 名称
+- 流程
+  - 获取用户的 openid
+    - 使用 http 向微信请求
+    - 参数：自己的 appid、secret，用户登录的 code，授权类型 grant_type（固定值）
+  - 判断 openid 是否为空
+  - 判断当前用户是否已经注册
+    - 根据 openid 查询用户表
+  - 新用户，自动完成注册 
+    - 用户信息插入用户表，并返回该记录的用户 id
+  - 返回用户对象
+- 生成 JWT 令牌加入到用户信息中返回
+- 创建拦截器校验用户带来的 JWT 令牌
+  - 在 sky-server 的 interceptor 中创建拦截器
+- 注册该拦截器
+  - 在 sky-server 的 WebMvcConfiguration 中注册拦截器
+
+</details>
+
+<details>
+
+<summary> 14. 导入商品浏览功能 </summary>
+
+1. 需求分析
+- 查询分类
+- 根据分类 id 查询菜品
+- 根据分类 id 查询套餐
+- 根据套餐 id 查询包含的菜品
+
+2. 接口信息
+
+- 查询分类
+
+（1）基本信息
+- path：/user/category/list
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称   | 类型      | 是否必须 | 默认值 | 备注                          | 其他信息  |
+|------|---------|------|-----|-----------------------------|-------|
+| type | integer | 非必须  |     | 分类类型：1为菜品分类，2为套餐分类，不传值为全部分类 |  |
+
+（3）返回数据
+
+| 名称                    | 类型      | 是否必须 | 默认值 | 备注               | 其他信息 |
+|-----------------------|---------|------|-----|------------------|------|
+| code                  | integer | 必须   |     | 状态码              |      |
+| msg                   | string  | 非必须  |     | 错误信息             |   |
+| data                  | object  | 必须   |     | 返回数据             |      |
+| &emsp;\|-- id         | integer | 必须   |     | 分类 id            |      |
+| &emsp;\|-- name       | string  | 必须   |     | 分类名称             |      |
+| &emsp;\|-- sort       | integer | 非必须   |     | 排序               |      |
+| &emsp;\|-- status     | integer | 非必须   |     | 分类状态，0为禁用，1为启用   |      |
+| &emsp;\|-- type       | integer | 非必须   |     | 类型，1为菜品分类，2为套餐分类 |      |
+| &emsp;\|-- createTime | string  | 必须   |     | 创建时间             |      |
+| &emsp;\|-- createUser | integer | 非必须  |     | 创建者              |      |
+| &emsp;\|-- updateTime | string  | 必须   |     | 修改时间             |      |
+| &emsp;\|-- updateUser | integer | 非必须   |     | 修改者              |      |
+
+- 根据分类 id 查询菜品
+
+（1）基本信息
+- path：/user/dish/list
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称         | 类型      | 是否必须 | 默认值 | 备注    | 其他信息  |
+|------------|---------|------|-----|-------|-------|
+| categoryId | integer | 必须   |     | 分类 id |  |
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注             | 其他信息 |
+|-------------------------------|------------|------|-----|----------------|------|
+| code                          | integer    | 必须   |     | 状态码            |      |
+| msg                           | string     | 非必须  |     | 错误信息           |   |
+| data                          | object     | 必须   |     | 返回数据           |      |
+| &emsp;\|-- categoryId         | integer    | 必须   |     | 分类 id          |      |
+| &emsp;\|-- categoryName       | integer    | 非必须  |     | 分类名称           |      |
+| &emsp;\|-- description        | string     | 非必须  |     | 菜品描述           |      |
+| &emsp;\|-- flavors            | object[]   | 非必须  |     | 口味             |      |
+| &emsp;&emsp;&emsp;\|-- dishId | integer    | 非必须  |     | 菜品 id          |      |
+| &emsp;&emsp;&emsp;\|-- id     | integer    | 非必须  |     | 口味 id          |      |
+| &emsp;&emsp;&emsp;\|-- name   | integer    | 非必须  |     | 口味名称           |      |
+| &emsp;&emsp;&emsp;\|-- value  | integer    | 非必须  |     | 口味数据           |      |
+| &emsp;\|-- id                 | integer    | 必须   |     | 菜品 id          |      |
+| &emsp;\|-- name               | string     | 必须   |     | 菜品名称           |      |
+| &emsp;\|-- image              | string     | 必须   |     | 菜品图片           |      |
+| &emsp;\|-- price              | bigdecimal | 必须   |     | 菜品价格           |      |
+| &emsp;\|-- status             | integer    | 非必须  |     | 售卖状态，0为停售，1为起售 |      |
+| &emsp;\|-- updateTime         | string     | 非必须  |     | 修改时间           |      |
+
+- 根据分类 id 查询套餐
+
+（1）基本信息
+- path：/user/setmeal/list
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称         | 类型      | 是否必须 | 默认值 | 备注    | 其他信息  |
+|------------|---------|------|-----|-------|-------|
+| categoryId | integer | 必须   |     | 分类 id |  |
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注    | 其他信息 |
+|-------------------------------|------------|------|-----|-------|------|
+| code                          | integer    | 必须   |     | 状态码   |      |
+| msg                           | string     | 非必须  |     | 错误信息  |   |
+| data                          | object     | 必须   |     | 返回数据  |      |
+| &emsp;\|-- categoryId         | integer    | 必须   |     | 分类 id |      |
+| &emsp;\|-- description        | string     | 非必须   |     | 套餐描述  |      |
+| &emsp;\|-- id                 | integer    | 必须   |     | 套餐 id |      |
+| &emsp;\|-- name               | string     | 必须   |     | 套餐名称  |      |
+| &emsp;\|-- image              | string     | 必须   |     | 套餐图片  |      |
+| &emsp;\|-- price              | bigdecimal | 必须   |     | 套餐价格           |      |
+| &emsp;\|-- status             | integer    | 非必须   |     | 售卖状态，0为停售，1为起售 |      |
+| &emsp;\|-- createTime | string  | 非必须   |     | 创建时间  |      |
+| &emsp;\|-- createUser | integer | 非必须  |     | 创建者   |      |
+| &emsp;\|-- updateTime | string  | 非必须   |     | 修改时间  |      |
+| &emsp;\|-- updateUser | integer | 非必须   |     | 修改者   |      |
+
+- 根据套餐 id 查询包含的菜品
+
+（1）基本信息
+- path：/user/setmeal/dish/{id}
+- method：GET
+
+（2）请求参数
+- 路径参数
+
+| 名称 | 类型      | 是否必须 | 默认值 | 备注    | 其他信息  |
+|----|---------|------|-----|-------|-------|
+| id | integer | 必须   |     | 套餐 id |  |
+
+（3）返回数据
+
+| 名称                     | 类型       | 是否必须 | 默认值 | 备注   | 其他信息 |
+|------------------------|----------|------|-----|------|------|
+| code                   | integer  | 必须   |     | 状态码  |      |
+| msg                    | string   | 非必须  |     | 错误信息 |   |
+| data                   | object[] | 非必须  |     | 返回数据 |      |
+| &emsp;\|-- copies      | integer  | 必须   |     | 份数   |      |
+| &emsp;\|-- description | string   | 必须   |     | 菜品描述 |      |
+| &emsp;\|-- image       | string   | 必须   |     | 菜品图片 |      |
+| &emsp;\|-- name        | string   | 必须   |     | 菜品名称 |      |
 
 </details>
