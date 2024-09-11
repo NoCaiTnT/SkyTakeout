@@ -1,7 +1,7 @@
 
-
 ## 注解
-### Swagger
+<details>
+<summary> Swagger </summary>
 
 | 注解               | 说明                                               |
 |-------------------|--------------------------------------------------|
@@ -10,7 +10,15 @@
 | @ApiModelProperty | 用在属性上，描述属性信息，通过 value 参数描述                       |
 | @ApiOperation     | 用在方法上，说明方法的用途、作用，如 Controller 的方法，通过 value 参数描述  |
 
-### @Result
+1. 接口区分
+- 在 WebMvcConfiguration 中配置 Swagger 的多个 Docket 对象
+- 通过 groupName 进行区分
+
+</details>
+
+<details>
+
+<summary> @Result </summary>
 解决 数据库表字段名 和 Java类变量名 对应关系
 如：
 ```java
@@ -31,6 +39,146 @@
     <result property="email" column="email_address"/>
 </resultMap>
 ```
+
+</details>
+
+## Redis
+
+<details>
+
+<summary> 1. 启动服务 </summary>
+
+1. 启动服务端：redis-server.exe redis.windows.conf
+   - 默认端口：6379
+2. 启动客户端：redis-cli.exe
+   - -h：指定ip
+   - -p：指定端口
+   - -a：密码
+3. 修改配置文件：redis.windows.conf
+   - requirepass：设置密码
+
+</details>
+
+<details>
+
+<summary> 2. 字符串操作命令 String </summary>
+
+| 命令                      | 解释                                    |
+|-------------------------|---------------------------------------|
+| SET key value           | 设置指定 key 的值                           |
+| GET key                 | 获取指定 key 的值                           |
+| SETEX key seconds value | 设置指定 key 的值，并将 key 的过期时间设置为 seconds 秒 |
+| SETNX key value         | 只有 key 不存在时设置 key 的值                  |
+
+</details>
+
+<details>
+
+<summary> 3. 哈希操作命令 Hash </summary>
+
+fieId 和 value 都是字符串
+
+| 命令                   | 解释                              |
+|----------------------|---------------------------------|
+| HSET key fieId value | 将哈希表 key 中的字段 field 的值设置为 value |
+| HGET key fieId       | 获取哈希表 key 中 field 字段的值          |
+| HDEL key fieId       | 删除哈希表 key 中的 field 字段           |
+| HKEYS key            | 获取哈希表 key 的所有字段（field）          |
+| HVALS key            | 获取哈希表 key 的所有值                  |
+
+</details>
+
+<details>
+
+<summary> 4. 列表操作命令 List </summary>
+
+简单的字符串列表，按插入顺序排序
+
+| 命令                        | 解释              |
+|---------------------------|-----------------|
+| LPUSH key value1 [value2] | 将一个/多个值插入到列表 头部 |
+| LRANGE key start stop     | 获取列表指定范围内的元素    |
+| RPOP key                  | 从列表 尾部 移除元素     |
+| LLEN key                  | 获取列表长度          |
+
+</details>
+
+<details>
+
+<summary> 5. 集合操作命令 Set </summary>
+
+集合内的元素也是字符串
+
+| 命令                         | 解释             |
+|----------------------------|----------------|
+| SADD key member1 [member2] | 向集合 key 添加元素   |
+| SMEMBERS key               | 返回集合 key 的所有元素 |
+| SCARD key                  | 返回集合 key 的元素数  |
+| SINTER key1 [key2]         | 返回给定所有集合的 交集   |
+| SUNION key1 [key2]         | 返回给定所有集合的 并集   |
+| SREM key member1 [member2] | 删除集合 key 中的元素  |
+
+</details>
+
+<details>
+
+<summary> 6. 有序集合操作命令 Zset </summary>
+
+集合内的元素也是字符串，有序，每个元素管理一个 double 类型的分数
+
+| 命令                                       | 解释                                      |
+|------------------------------------------|-----------------------------------------|
+| ZADD key score1 member1 [score2 member2] | 向有序集合 key 添加元素                          |
+| ZRANGE key start stop [WITHSCORES]       | 获得有序集合指定范围的元素，也可以通过 WITHSCORES 将分数一起返回  |
+| ZINCRBY key increment member             | 对有序集合 key 中的成员 member 的分数增量加上 increment |
+| SREM key member1 [member2]               | 删除有序集合 key 中的元素                         |
+
+</details>
+
+<details>
+
+<summary> 7. 通用操作命令 </summary>
+
+不分数据类型，都可以使用的命令
+
+| 命令           | 解释                                            |
+|--------------|-----------------------------------------------|
+| KEYS pattern | 查找所有符合给定模式 pattern 的 key，如 KEYS * / KEYS set* |
+| EXISTS key   | 判断 key 是否存在                                   |
+| TYPE key     | 获得 key 所存储的值的类型                               |
+| DEL key      | 在 key 存在时删除 key，可以删除多个                        |
+
+</details>
+
+<details>
+
+<summary> 8. 在 Java 中使用 Redis：Spring Data Redis </summary>
+
+1. 操作步骤
+- 导入 Spring Data Redis 的 Maven 坐标
+  - sky-server 的 pom 文件
+- 配置 Redis 数据源
+  - application.yml 和 application-dev.yml
+- 编写配置类，创建 RedisTemplate 对象
+  - com.sky.config 中创建 RedisConfiguration
+  - 设置 Redis 的连接工厂，获取 Redis 连接，与 Redis 服务器建立通讯
+  - 设置 Redis key 的序列化器，将 Redis 中的二进制数据转换为字符串
+- 通过 RedisTemplate 对象操作 Redis
+
+2. 单元测试
+- 在 test/java 文件夹下，创建 SpringDataRedisTest 类
+- 使用不同对象操作不同数据类型
+```
+  ValueOperations valueOperations = redisTemplate.opsForValue();
+  HashOperations hashOperations = redisTemplate.opsForHash();
+  ListOperations listOperations = redisTemplate.opsForList();
+  SetOperations setOperations = redisTemplate.opsForSet();
+  ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+```
+- 操作通用类型命令时，使用 RedisTemplate 对象
+
+</details>
+
 ## 需求分析
 <details>
 <summary>1. JWT令牌</summary>
@@ -675,7 +823,83 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 | msg                           | string     | 非必须  |     | 错误信息       |   |
 | data                          | object     | 非必须   |     | 返回数据       |      |
 
-3. 具体实现
+</details>
 
+<details>
+
+<summary> 12. 店铺营业状态设置 </summary>
+
+1. 需求分析
+- 设置营业状态
+- 管理端查询营业状态
+- 用户端查询营业状态
+
+2. 接口信息
+- 设置营业状态
+
+（1）基本信息
+- path：/admin/shop/{status}
+- method：PUT
+
+（2）请求参数
+- Headers
+
+| 名称           | 类型               | 是否必须 | 描述 |
+|--------------|------------------|------|-----|
+| Content-Type | application/json | 必须   |     |
+
+- 路径参数
+
+| 名称 | 类型      | 是否必须 | 默认值 | 备注                 | 其他信息  |
+|----|---------|------|-----|--------------------|-------|
+| status | integer | 必须   |     | 店铺营业状态：1 为营业，2 为打烊 |  |
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注         | 其他信息 |
+|-------------------------------|------------|------|-----|------------|------|
+| code                          | integer    | 必须   |     | 状态码        |      |
+| msg                           | string     | 非必须  |     | 错误信息       |   |
+| data                          | object     | 非必须   |     | 返回数据       |      |
+
+- 管理端查询营业状态
+
+（1）基本信息
+- path：/admin/shop/status
+- method：GET
+
+（2）请求参数 
+
+无
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注             | 其他信息 |
+|-------------------------------|------------|------|-----|----------------|------|
+| code                          | integer    | 必须   |     | 状态码            |      |
+| msg                           | string     | 非必须  |     | 错误信息           |   |
+| data                          | object     | 必须   |     | 返回数据，1为营业，2为打烊 |      |
+
+- 用户端查询营业状态
+
+（1）基本信息
+- path：/user/shop/status
+- method：GET
+
+（2）请求参数
+
+无
+
+（3）返回数据
+
+| 名称                            | 类型         | 是否必须 | 默认值 | 备注             | 其他信息 |
+|-------------------------------|------------|------|-----|----------------|------|
+| code                          | integer    | 必须   |     | 状态码            |      |
+| msg                           | string     | 非必须  |     | 错误信息           |   |
+| data                          | object     | 必须   |     | 返回数据，1为营业，2为打烊 |      |
+
+3. 具体实现
+- 使用 Redis 进行存储
+  - 1为营业，0为打烊
 
 </details>
