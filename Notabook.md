@@ -181,6 +181,11 @@ fieId 和 value 都是字符串
 
 ## HttpClient
 用于构造、发送 Http 请求，在 Java 中以代码方式发送 Http 请求
+
+<details>
+
+<summary> 1. 使用方法 </summary>
+
 - 案例在 sky-server 的 test/HttpClientTest 中
 - 已经封装在了 sky-common 中的 HttpClientUtils 中
 - 将 Httpclient 坐标导入到 Maven 中
@@ -203,6 +208,53 @@ fieId 和 value 都是字符串
 - 关闭资源
   - 关闭 CloseableHttpResponse 对象 response
   - 关闭 CloseableHttpClient 对象
+
+</details>
+
+
+## Spring Cache
+<details>
+
+<summary> 1. 使用方法 </summary>
+
+Spring Cache 是一个框架，实现了基于 注解 的缓存功能，只需要添加注解即可实现缓存功能
+
+提供了一层抽象，底层可以切换不同的缓存实现
+- EHCache
+- Caffeine
+- Redis
+
+具体使用
+- 导入 Maven 坐标
+- 使用 Redis 就导入 Redis 的坐标，其他同理
+</details>
+
+<details>
+
+<summary> 2. 常用注解 </summary>
+
+| 注解             | 说明                                 |
+|----------------|------------------------------------|
+| @EnableCaching | 开启缓存注解功能，加在启动类上                    |
+| @Cacheable     | 在方法执行前先查询缓存，有就返回；没有就执行方法，并将返回值放到缓存 |
+| @CachePut      | 将方法的返回值放到缓存                        |
+| @CacheEvict    | 将一条或多条数据从缓存中删除                     |
+
+- @CachePut：加到 Controller 的方法上
+  - 使用方法：@CachePut(cacheNames = "userCache", key = "#user.id")
+  - 生成 key 的规则：userCache::1，即 cacheNames + :: + key 这种格式
+  - key 用形参赋值：# + 形参名.属性
+  - key 用形参赋值：# + p0.属性，或者 # + a0.属性，或者 # + root.args[0].属性（表示第一个参数，下标从 0 开始）
+  - key 用返回值赋值：# + result.属性
+- @Cacheable：加到 Controller 的方法上
+  - 使用方法：@Cacheable(cacheNames = "userCache", key = "#id")
+- @CacheEvict：加到 Controller 的方法上
+  - 使用方法：@CacheEvict(cacheNames = "userCache", key = "#id")
+  - 删除所有：@CacheEvict(cacheNames = "userCache", allEntries = true)
+  - allEntries：是否清空所有缓存，默认为 false
+  - beforeInvocation：是否在方法执行前清空缓存，默认为 false
+
+</details>
 
 ## 需求分析
 <details>
@@ -1147,5 +1199,17 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - 在 Redis 中查询该分类的 id
   - 若存在，直接返回结果
   - 若不存在，查询 db，将查询到的结果写入 Redis
+
+</details>
+
+<details>
+<summary> 16. 缓存套餐信息（使用 Spring Cache） </summary>
+
+1. 具体实现
+- 导入 Spring Cache 和 Redis 相关的 Maven 坐标
+- 在启动类上加入 @EnableCaching 注解，开启缓存注解功能
+- 用户端接口 SetmealController 的 list 方法加入 @Cacheable 注解
+- 管理端接口 SetmealController 的 add、update、delete、startOrStop 方法加入 @CacheEvict 注解
+  - 新增、修改、删除、起售停售状态改变
 
 </details>
