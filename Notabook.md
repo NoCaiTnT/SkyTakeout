@@ -1214,7 +1214,6 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 </details>
 
-
 <details>
 <summary> 17. 购物车 </summary>
 
@@ -1279,5 +1278,43 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 在 user 中新增 ShoppingCartController
 - 创建 ShoppingCartService
 - 创建 ShoppingCartMapper
+  - 实现查询、添加、修改
+
+</details>
+
+<details>
+<summary> 18. 查看购物车 </summary>
+
+1. 需求分析
+- 查询用户的购物车数据
+
+2. 接口设计
+
+（1）基本信息
+- path：/user/shoppingCart/list
+- method：GET
+- 请求参数：不用参数，可以通过 ThreadLocal 拿id
+
+（2）返回数据
+
+| 名称                    | 类型        | 是否必须 | 默认值 | 备注    | 其他信息 |
+|-----------------------|-----------|-----|-----|-------|------|
+| code                  | integer   | 必须  |     | 状态码   |      |
+| msg                   | string    | 非必须 |     | 错误信息  |   |
+| data                  | object[]  | 必须  |     | 返回数据  |      |
+| &emsp;\|-- id         | integer   | 必须   |     | 唯一标识  |      |
+| &emsp;\|-- name       | string    | 必须   |     | 商品名称  |      |
+| &emsp;\|-- userId     | integer   | 必须   |     | 用户 id |      |
+| &emsp;\|-- dishId     | integer   | 必须   |     | 菜品 id |      |
+| &emsp;\|-- setmealId  | integer   | 必须   |     | 套餐 id |      |
+| &emsp;\|-- dishFlavor | string    | 必须   |     | 菜品口味  |      |
+| &emsp;\|-- number     | integer   | 必须   |     | 数量    |      |
+| &emsp;\|-- amount     | decimal   | 必须   |     | 价格    |      |
+| &emsp;\|-- image      | string    | 必须   |     | 图片地址  |      |
+| &emsp;\|-- createTime | string    | 必须   |     | 创建时间  |      |
+
+3. 具体实现
+
+
 
 </details>

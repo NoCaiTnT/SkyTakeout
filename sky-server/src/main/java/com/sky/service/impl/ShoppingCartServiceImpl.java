@@ -82,9 +82,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCartMapper.insert(shoppingCart);
 
         }
+    }
 
+    /**
+     * 查看购物车
+     * @return
+     */
+    public List<ShoppingCart> showShoppingCart() {
+        // 通过 ThreadLocal 获取用户 id
+        Long userId = BaseContext.getCurrentId();
 
+        // 构造 shoppingCart
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .userId(userId)
+                .build();
 
+        // 查询购物车信息
+        List<ShoppingCart> shoppingCarts = shoppingCartMapper.list(shoppingCart);
 
+        return shoppingCarts;
     }
 }
