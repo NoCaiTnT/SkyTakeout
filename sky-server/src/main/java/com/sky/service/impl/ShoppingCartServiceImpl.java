@@ -112,4 +112,34 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         shoppingCartMapper.cleanById(userId);
     }
+
+    /**
+     * 减少购物车商品数量
+     * @param shoppingCartDTO
+     */
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        // 通过 ThreadLocal 获取用户 id
+        Long userId = BaseContext.getCurrentId();
+
+        // 构建该商品的信息
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .userId(userId)
+                .dishId(shoppingCartDTO.getDishId())
+                .setmealId(shoppingCartDTO.getSetmealId())
+                .dishFlavor(shoppingCartDTO.getDishFlavor())
+                .build();
+
+        // 查询该商品的数量
+        List<ShoppingCart> shoppingCarts = shoppingCartMapper.list(shoppingCart);
+        if (shoppingCarts != null && shoppingCarts.size() > 0) {
+            ShoppingCart cart = shoppingCarts.get(0);
+            if (cart.getNumber() > 1) {
+                cart.setNumber(cart.getNumber() - 1);
+                shoppingCartMapper.updateNumberById(cart);
+            } else {
+                // 删除该商品
+                shoppingCartMapper.deleteById(cart.getId());
+            }
+        }
+    }
 }
