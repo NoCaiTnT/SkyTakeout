@@ -1213,3 +1213,71 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - 新增、修改、删除、起售停售状态改变
 
 </details>
+
+
+<details>
+<summary> 17. 购物车 </summary>
+
+1. 需求分析
+- 没有口味选择的商品直接加入购物车
+- 有口味的商品，需要选择口味后加入购物车
+- 相同商品，只需要数量相加，不需要重复展示
+
+2. 接口设计
+
+（1）基本信息
+- path：/user/shoppingCart/add
+- method：POST
+- 请求参数：套餐 id、菜品 id、口味
+  - 对于某一次提交，要么是套餐 id，要么是菜品 id
+
+（2）请求参数
+- Headers
+
+| 名称           | 类型               | 是否必须 | 描述 |
+|--------------|------------------|------|-----|
+| Content-Type | application/json | 必须   |     |
+
+- Body
+
+| 名称         | 类型         | 是否必须 | 默认值 | 备注    | 其他信息 |
+|------------|------------|----|-----|-------|------|
+| dishFlavor | string    | 非必须 |     | 菜品口味  |      |
+| dishId     | integer     | 非必须 |     | 菜品 id |      |
+| setmealId  | integer   | 非必须 |     | 套餐 id |      |
+
+
+（3）返回数据
+
+| 名称                     | 类型       | 是否必须 | 默认值 | 备注   | 其他信息 |
+|------------------------|----------|------|-----|------|------|
+| code                   | integer  | 必须   |     | 状态码  |      |
+| msg                    | string   | 非必须  |     | 错误信息 |   |
+| data                   | object[] | 非必须  |     | 返回数据 |      |
+
+3. 数据库设计
+- 作用：暂时存放所选商品的地方
+- 选的什么商品（套餐还是菜品），菜品有没有口味
+- 每个商品买了几个，不同口味的商品不能叠加
+- 不同用户的购物车需要分开
+- 冗余字段：提高查询速度，避免连表查询
+
+| 名称          | 类型            | 说明    | 备注   |
+|-------------|---------------|-------|------|
+| id          | bigint        | 主键    |      |
+| name        | varchar(32)   | 商品名   | 冗余字段     |
+| image       | varchar(255)  | 商品图片  | 冗余字段     |
+| user_id     | bigint        | 用户 id |      |
+| dish_id     | bigint        | 菜品 id |      |
+| setmeal_id  | bigint        | 套餐 id |      |
+| dish_flavor | varchar(50)   | 菜品口味  |      |
+| number      | int           | 商品数量  |      |
+| amount      | decimal(10,2) | 商品单价  | 冗余字段 |
+| create_time | datetime      | 创建时间  |      |
+
+4. 具体实现
+- 在 user 中新增 ShoppingCartController
+- 创建 ShoppingCartService
+- 创建 ShoppingCartMapper
+
+</details>
