@@ -102,4 +102,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         return shoppingCarts;
     }
+
+    /**
+     * 清空购物车
+     */
+    public void cleanShoppingCart() {
+        // 通过 ThreadLocal 获取用户 id
+        Long userId = BaseContext.getCurrentId();
+
+        shoppingCartMapper.cleanById(userId);
+    }
 }

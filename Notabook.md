@@ -1313,8 +1313,27 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 | &emsp;\|-- image      | string    | 必须   |     | 图片地址  |      |
 | &emsp;\|-- createTime | string    | 必须   |     | 创建时间  |      |
 
-3. 具体实现
+</details>
 
+<details>
+<summary> 19. 清空购物车 </summary>
 
+1. 需求分析
+- 删除用户的购物车数据
+
+2. 接口设计
+
+（1）基本信息
+- path：/user/shoppingCart/clean
+- method：DELETE
+- 请求参数：不用参数，可以通过 ThreadLocal 拿id
+
+（2）返回数据
+
+| 名称                    | 类型      | 是否必须 | 默认值 | 备注    | 其他信息 |
+|-----------------------|---------|-----|-----|-------|------|
+| code                  | integer | 必须  |     | 状态码   |      |
+| msg                   | string  | 非必须 |     | 错误信息  |   |
+| data                  | object  | 非必须  |     | 返回数据  |      |
 
 </details>
