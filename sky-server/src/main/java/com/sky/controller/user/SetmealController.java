@@ -8,6 +8,8 @@ import com.sky.vo.DishItemVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,9 @@ import java.util.List;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 条件查询
@@ -34,7 +39,24 @@ public class SetmealController {
         setmeal.setCategoryId(categoryId);
         setmeal.setStatus(StatusConstant.ENABLE);
 
-        List<Setmeal> list = setmealService.list(setmeal);
+        // 构造 key
+        String key = "setmeal_" + categoryId;
+
+        // 查询 Redis
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        List<Setmeal> list = (List<Setmeal>) valueOperations.get(key);
+
+        // 如果查询到，直接返回
+        if (list != null && list.size() > 0) {
+            return Result.success(list);
+        }
+
+        // 如果没有查询到
+        list = setmealService.list(setmeal);
+
+        // 写入 Redis
+        valueOperations.set(key, list);
+
         return Result.success(list);
     }
 
