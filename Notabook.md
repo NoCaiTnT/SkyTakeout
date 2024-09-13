@@ -936,7 +936,72 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary> 12. 店铺营业状态设置 </summary>
+<summary> 12. 套餐相关 </summary>
+
+1. 需求分析
+- 新增套餐
+- 套餐分页查询
+- 删除套餐
+- 修改套餐
+- 起售停售套餐
+
+2. 接口设计
+
+<details>
+<summary style="margin-left: 20px;"> 2.1 新增套餐 </summary>
+
+（1）根据分类 id 查询菜品
+- path：/admin/dish/list
+- method：GET
+
+（2）新增套餐
+- path：/admin/setmeal
+- method：POST
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.2 套餐分页查询 </summary>
+
+- path：/admin/setmeal/page
+- method：GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.3 删除套餐 </summary>
+
+- path：/admin/setmeal
+- method：DELETE
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.4 修改套餐 </summary>
+
+（1）根据 id 查询套餐
+- path：/admin/setmeal/{id}
+- method：GET
+
+（2）修改套餐
+- path：/admin/setmeal
+- method：PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.5 起售停售套餐 </summary>
+
+- path：/admin/setmeal/status/{status}
+- method：POST
+
+</details>
+
+</details>
+
+<details>
+
+<summary> 13. 店铺营业状态设置 </summary>
 
 1. 需求分析
 - 设置营业状态
@@ -1028,7 +1093,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary> 13. 微信登录 </summary>
+<summary> 14. 微信登录 </summary>
 
 1. 需求分析
 - 基于微信登录实现小程序的登录功能
@@ -1091,7 +1156,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary> 14. 导入商品浏览功能 </summary>
+<summary> 15. 导入商品浏览功能 </summary>
 
 1. 需求分析
 - 查询分类
@@ -1243,7 +1308,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary> 15. 缓存菜品信息 </summary>
+<summary> 16. 缓存菜品信息 </summary>
 
 1. 需求分析
 - 每个分类下的菜品保存一份缓存数据，用户端进行请求
@@ -1264,7 +1329,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 16. 缓存套餐信息（使用 Spring Cache） </summary>
+<summary> 17. 缓存套餐信息（使用 Spring Cache） </summary>
 
 1. 具体实现
 - 导入 Spring Cache 和 Redis 相关的 Maven 坐标
@@ -1276,7 +1341,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 17. 购物车 </summary>
+<summary> 18. 购物车 </summary>
 
 1. 需求分析
 - 没有口味选择的商品直接加入购物车
@@ -1344,7 +1409,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 18. 查看购物车 </summary>
+<summary> 19. 查看购物车 </summary>
 
 1. 需求分析
 - 查询用户的购物车数据
@@ -1377,7 +1442,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 19. 清空购物车 </summary>
+<summary> 20. 清空购物车 </summary>
 
 1. 需求分析
 - 删除用户的购物车数据
@@ -1400,7 +1465,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 20. 导入地址簿 </summary>
+<summary> 21. 导入地址簿 </summary>
 
 1. 需求分析
 - 用户可以有多个地址，但只有 1 个默认地址
@@ -1457,7 +1522,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary style="margin-left: 20px;"> 2.2 查询用户所有地址 </summary>>
+<summary style="margin-left: 20px;"> 2.2 查询用户所有地址 </summary>
 
 （1）基本信息
 - path：/user/addressBook/list
@@ -1661,7 +1726,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 21. 用户下单 </summary>
+<summary> 22. 用户下单 </summary>
 
 1. 需求分析
 - 地址簿 id
@@ -1728,7 +1793,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 <details>
-<summary> 22. 微信订单支付（微信小程序支付） </summary>
+<summary> 23. 微信订单支付（微信小程序支付） </summary>
 
 1. 需求分析
 - 微信小程序订单支付（涉及用户端、服务端、微信后台）
@@ -1762,5 +1827,50 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 配置微信支付相关配置项，application.yml
 - 导入代码
 - 由于没有证书，无法测试相关功能 
+
+</details>
+
+
+<details>
+
+<summary> 24. 用户端历史订单模块 </summary>
+
+1. 需求分析
+- 查询历史订单
+- 查询订单详情
+
+2. 接口设计
+
+<details>
+<summary style="margin-left: 20px;"> 2.1 查询历史订单 </summary>
+
+- path：/user/order/historyOrders
+- GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.2 查询订单详情 </summary>
+
+- path：/user/order/orderDetail/{id}
+- GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.3 取消订单 </summary>
+
+- path：/user/order/cancel/{id}
+- PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.4 再来一单 </summary>
+
+- path：/user/order/repetition/{id}
+- POST
+
+</details>
 
 </details>
