@@ -1958,3 +1958,20 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 </details>
 
 </details>
+
+<details>
+
+<summary> 26. 校验收货地址是否超出配送范围 </summary>
+
+1. 需求分析
+- 判断用户地址和商家地址的距离
+
+2. 具体实现
+- 使用百度地图开放平台：https://lbsyun.baidu.com/
+- 创建服务端应用，获取 AK
+- 在 application.yml 中配置商家地址和百度地图 AK
+- 在 OrderServiceImpl 中，注入商家地址和 AK，使用 @Value("${sky.shop.address}") 和 @Value("${sky.baidu.ak}")
+- 在 OrderServiceImpl 中，调用 API，提供距离校验方法
+- 在 OrderServiceImpl 中的 submitOrder 方法中，调用距离校验方法
+
+</details>
