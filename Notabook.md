@@ -1726,3 +1726,41 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 新增 OrderDetailMapper.xml
 
 </details>
+
+<details>
+<summary> 22. 微信订单支付（微信小程序支付） </summary>
+
+1. 需求分析
+- 微信小程序订单支付（涉及用户端、服务端、微信后台）
+  - 用户下单，服务端返回订单号等信息
+  - 用户申请微信支付，服务端调用微信下单接口（预下单，查微信支付接口，JSAPI下单）
+  - 微信返回预支付交易标识
+  - 服务端组合数据再次签名，返回支付参数给用户
+  - 用户确认支付，直接调用微信支付接口（wx.requestPayment）
+  - 微信返回支付结果给用户，显示支付结果
+  - 微信回调服务端接口，推送支付结果，服务端更新订单状态
+
+2. 存在问题
+
+（1）调用过程中的数据安全：签名、加密解密
+- 需要商户私钥文件：apiclient_key.pem
+- 需要微信支付平台整数：wechatpay_xxxxxx.pem
+
+（2）微信后台回调，怎么向服务端发送请求（服务端是局域网）：需要公网 ip，内网穿透
+- 使用 cpolar：dashboard.cpolar.com
+- 使用令牌 Authtoken，该令牌在验证中，复制
+  - 在 C:\Program Files\cpolar 中使用 cmd：输入以下代码
+  - cpolar.exe authtoken xxxxxxxx
+  - 生成配置文件：C:\Users\NoCai\.cpolar\cpolar.yml
+- 获取临时公网 ip
+  - 在 cmd 中输入代码：cpolar.exe http 8080
+  - 8080 为服务端的端口号
+  - 得到公网 ip 地址，在 Forwarding 中显示
+- 使用公网 ip
+
+3. 具体操作
+- 配置微信支付相关配置项，application.yml
+- 导入代码
+- 由于没有证书，无法测试相关功能 
+
+</details>
