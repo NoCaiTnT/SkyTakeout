@@ -1660,3 +1660,69 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 </details>
 
+<details>
+<summary> 21. 用户下单 </summary>
+
+1. 需求分析
+- 地址簿 id
+- 配送状态（立即送出、选择送出时间）
+- 打包费、总金额（配送费固定为6块）
+- 备注
+- 餐具数量
+
+2. 接口设计
+
+（1）基本信息
+- path：/user/order/submit
+- method：POST
+
+（2）请求参数
+- Headers
+
+| 名称           | 类型               | 是否必须 | 描述 |
+|--------------|------------------|------|-----|
+| Content-Type | application/json | 必须   |     |
+
+- Body
+
+| 名称                    | 类型      | 是否必须 | 默认值 | 备注                      | 其他信息 |
+|-----------------------|---------|-----|-----|-------------------------|------|
+| addressBookId         | integer | 必须  |     | 地址簿 id                  |      |
+| amount                | decimal | 必须  |     | 总金额                     |      |
+| deliveryStatus        | integer | 必须  |     | 配送状态：1为立即送出，0为选择具体时间    |      |
+| estimatedDeliveryTime | string  | 必须  |     | 预计送达时间                  |      |
+| packAmount            | decimal | 必须  |     | 打包费                     |      |
+| payMethod             | integer | 必须  |     | 付款方式                    |      |
+| remark                | string  | 必须  |     | 备注                      |      |
+| tablewareNumber       | integer | 必须  |     | 餐具数量                    |      |
+| tablewareStatus       | integer | 必须  |     | 餐具数量状态，1为按餐量提供，0为选择具体数量 |      |
+
+（3）返回数据
+
+| 名称                     | 类型      | 是否必须 | 默认值 | 备注    | 其他信息 |
+|------------------------|---------|----|-----|-------|------|
+| code                   | integer | 必须 |     | 状态码   |      |
+| msg                    | string  | 非必须 |     | 错误信息  |   |
+| data                   | object  | 必须 |     | 返回数据  |      |
+| &emsp;\|-- id          | integer | 必须 |     | 订单 id |      |
+| &emsp;\|-- orderAmount | integer | 必须 |     | 订单总金额 |      |
+| &emsp;\|-- orderNumber | string | 必须 |     | 订单号   |      |
+| &emsp;\|-- orderTime   | string | 必须 |     | 下单时间  |      |
+
+
+3. 数据库设计
+
+见数据库
+- 订单表
+- 订单明细表
+
+4. 具体实现
+- 新增 OrderController
+- 新增 OrderService
+- 新增 OrderServiceImpl
+- 新增 OrderMapper
+- 新增 OrderDetailMapper
+- 新增 OrderMapper.xml
+- 新增 OrderDetailMapper.xml
+
+</details>
