@@ -1838,6 +1838,8 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 1. 需求分析
 - 查询历史订单
 - 查询订单详情
+- 取消订单
+- 再来一单
 
 2. 接口设计
 
@@ -1870,6 +1872,88 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 - path：/user/order/repetition/{id}
 - POST
+
+</details>
+
+</details>
+
+<details>
+
+<summary> 25. 商家端订单管理模块 </summary>
+
+1. 需求分析
+- 订单搜索
+- 统计各状态订单数量
+- 查询订单详情
+- 接单
+- 拒单
+- 取消订单
+- 派送订单
+- 完成订单
+
+2. 接口设计
+
+<details>
+<summary style="margin-left: 20px;"> 2.1 订单搜索 </summary>
+
+- path：/admin/order/conditionSearch
+- GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.2 统计各状态订单数量 </summary>
+
+- path：/admin/order/statistics
+- GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.3 查询订单详情 </summary>
+
+- path：/admin/order/details/{id}
+- GET
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.4 接单 </summary>
+
+- path：/admin/order/confirm
+- PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.5 拒单 </summary>
+
+- path：/admin/order/rejection
+- PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.6 取消订单 </summary>
+
+- path：/admin/order/cancel
+- PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.7 派送订单 </summary>
+
+- path：/admin/order/delivery/{id}
+- PUT
+
+</details>
+
+<details>
+<summary style="margin-left: 20px;"> 2.8 完成订单 </summary>
+
+- path：/admin/order/complete/{id}
+- PUT
 
 </details>
 
