@@ -291,15 +291,47 @@ Cron 表达式其实就是一个字符串，通过 Cron 表达式可以定义任
 
 </details>
 
-<details>
-<summary> 3. 使用方法 </summary>
+## WebSocket
+WebSocket 是基于 TCP 的一种新的网络协议，实现了浏览器与服务器的全双工通信
+- 浏览器和服务器只需完成一次握手，两者之间可以创建 持久性 的连接，并进行 双向 数据传输
 
-- 导入 Maven 坐标 spring-context
-- 启动类添加注解 @EnableScheduling 开启任务调度
-- 自定义定时任务类
-  - 需要加上 @Component 注解
-- 定义任务方法，没有返回值
-  - 需要 @Scheduled 注解，参数为 Cron 表达式
+HTTP 与 WebSocket的区别
+- HTTP 是短连接，WebSocket 是长连接
+- HTTP 通信是单向的，基于请求响应模式
+- WebSocket 支持双向通信
+- 二者的底层都是 TCP 连接
+
+<details>
+
+<summary> 1. 使用场景 </summary>
+
+服务器主动推送数据给服务端
+- 视频弹幕
+- 网页聊天
+- 体育实况更新
+- 股票基金报价实时更新
+
+</details>
+
+<details>
+
+<summary> 2. 入门案例 </summary>
+
+- 直接使用 websocket.html 页面作为 WebSocket 客户端
+  - 建立连接、许多回调方法、关闭连接、内容显示、发送消息给服务端
+  - 建立连接，需要指定路径：ws://localhost:8080/ws/clientId
+- 服务端导入 WebSocket 的 Maven 坐标
+- 导入 WebSocket 服务端组件 WebSocketServer，用于和客户端通信
+  - 在 sky-server 下创建包 websocket，导入 WebSocketServer
+  - 类使用注解：@Component
+  - 类使用注解：@ServerEndpoint，提供连接路径 ws/{clientId}
+  - 定义回调方法（通过 id 区分不同客户端）：建立连接、接收消息、关闭连接、群发方法
+- 导入配置类 WebSocketConfiguration，注册 WebSocket 的服务端组件
+  - 类使用注解：@Configuration
+  - 方法使用注解：@Bean
+- 导入定时任务类 WebSocketTask，用于定时向客户端发送消息
+  - 放到 task 包下
+  - 注入 WebSocketServer
 
 </details>
 
@@ -2039,6 +2071,8 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - 将这些订单的状态设置为"已取消"，设置取消原因和取消时间
   - 更新数据库
 - 添加处理一直处于派送中的订单 processDeliveryOrder
-  -  
+  - 每天凌晨 1 点查询一次，派送中 且 下单时间距离现在大于 1 小时（昨天的订单）
+  - 将这些订单的状态设置为"已完成"
+  - 更新数据库
 
 </details>
