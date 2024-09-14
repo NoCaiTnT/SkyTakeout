@@ -2076,3 +2076,27 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
   - 更新数据库
 
 </details>
+
+<details>
+
+<summary> 28. 来单提醒 </summary>
+
+1. 需求分析
+
+用户下单后需要在网页上提醒商家，两种形式
+- 语音播报
+- 弹出提示框
+
+2. 具体实现
+- 通过 WebSocket 实现管理端页面和服务端的长连接
+- 客户支付后，调用 WebSocket 的相关 API 实现服务端想管理端推送消息
+  - 支付成功后，微信后台回调服务端的 paySuccessNotify 方法（在 controller 包下的 PayNotifyController 中）
+  - 在该方法中，调用 orderService 的 paySuccess 进行订单处理
+  - 在 paySuccess 使用 WebSocket 通知管理端
+- 管理端浏览器解析消息，判断来单提醒还是客户催单，进行相应的提示和语音播报
+- 服务端给管理端的数据格式：JSON
+  - type：消息类型，1为来单提醒，2为客户催单
+  - orderId：订单 id
+  - content：消息内容
+
+</details>
