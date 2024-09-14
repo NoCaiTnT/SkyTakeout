@@ -257,6 +257,52 @@ Spring Cache 是一个框架，实现了基于 注解 的缓存功能，只需�
 
 </details>
 
+## Spring Task
+Spring Task 是 Spring 框架提供的任务调度工具，可以按照约定的时间自动执行某个代码逻辑
+- 定位：定时任务框架
+- 作用：定时自动执行某段 Java 代码
+
+<details>
+
+<summary> 1. 应用场景 </summary>
+
+- 信用卡每月还款提醒
+- 银行贷款每月还款提醒
+- 火车票售票系统处理未支付订单
+- 入职纪念日为用户发送通知
+- 等等
+
+</details>
+
+<details>
+<summary> 2. Cron 表达式 </summary>
+
+Cron 表达式其实就是一个字符串，通过 Cron 表达式可以定义任务触发的时间
+
+规则构成：分为 6 或 7 个域，由空格分开，每个域代表一个含义
+- 秒、分钟、小时、日、月、周、年（可选）
+- 周：星期几
+- 日 和 周往往不能同时出现，例如 每个月的 5 号不一定都是星期 3，其中一个写成 ?
+- 使用 Cron 表达式在线生成器生成：https://cron.qqe2.com
+
+| 秒 | 分钟 | 小时 | 日 | 月  | 周 | 年    | 备注                     | 表达式                |
+|---|----|----|---|----|---|------|------------------------|--------------------|
+| 0 | 0  | 9  | 12 | 10 | ? | 2022 | 2022 年 10 月 12 日上午 9点整 | 0 0 9 12 10 ？ 2022 |
+
+</details>
+
+<details>
+<summary> 3. 使用方法 </summary>
+
+- 导入 Maven 坐标 spring-context
+- 启动类添加注解 @EnableScheduling 开启任务调度
+- 自定义定时任务类
+  - 需要加上 @Component 注解
+- 定义任务方法，没有返回值
+  - 需要 @Scheduled 注解，参数为 Cron 表达式
+
+</details>
+
 ## 需求分析
 <details>
 <summary>1. JWT令牌</summary>
@@ -1973,5 +2019,26 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 在 OrderServiceImpl 中，注入商家地址和 AK，使用 @Value("${sky.shop.address}") 和 @Value("${sky.baidu.ak}")
 - 在 OrderServiceImpl 中，调用 API，提供距离校验方法
 - 在 OrderServiceImpl 中的 submitOrder 方法中，调用距离校验方法
+
+</details>
+
+<details>
+
+<summary> 27. 订单状态定时处理 </summary>
+
+1. 需求分析
+- 用户下单但未支付，订单一直处于"待支付"的状态，超时需要取消订单
+  - 每分钟检查一次是否存在支付超时订单（下单超过 15 分钟仍未支付），改为"已取消"
+- 用户收货后，管理端未点击完成按钮，订单一直处于"派送中"状态，需要完成订单
+  - 每天凌晨 1 点检查一次是否存在"派送中"的订单，存在则改为"已完成"
+
+2. 具体实现
+- 在 sky-server 中，创建 task 包，创建 OrderTask 类
+- 添加处理超时订单方法 processTimeoutOrder 
+  - 每分钟查询一次，下单未支付 且 下单时间距离现在大于 15 min
+  - 将这些订单的状态设置为"已取消"，设置取消原因和取消时间
+  - 更新数据库
+- 添加处理一直处于派送中的订单 processDeliveryOrder
+  -  
 
 </details>
