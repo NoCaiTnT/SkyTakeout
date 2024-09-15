@@ -2336,3 +2336,93 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 使用流式处理获得列表：List<String> nameList = salesTop10List.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
 
 </details>
+
+<details>
+
+<summary> 34. 工作台 </summary>
+
+1. 需求分析
+
+- 工作台展示的数据
+  - 今日数据：营业额、有效订单、订单完成率、平均客单价、新增用户数
+    - 平均客单价：营业额 / 有效订单数
+  - 订单管理：待接单、待配送、已完成、已取消、全部订单
+  - 菜品总览：已起售、已停售
+  - 套餐总览：已起售、已停售
+  - 订单信息：待接单、待派送
+
+2. 接口设计
+
+- 今日数据接口
+
+（1）基本信息
+- path：/admin/workspace/businessData
+- method：GET
+
+（2）返回数据
+
+| 名称                             | 类型         | 是否必须 | 默认值 | 备注    | 其他信息 |
+|--------------------------------|------------|-----|-----|-------|------|
+| code                           | integer    | 必须  |     | 状态码   |      |
+| msg                            | string     | 非必须 |     | 错误信息  |   |
+| data                           | object     | 非必须  |     | 返回数据  |      |
+| &emsp;\|-- newUsers            | integer    | 必须 |     | 新增用户数 |      |
+| &emsp;\|-- orderCompletionRate | bigdecimal | 必须 |     | 订单完成率 |      |
+| &emsp;\|-- turnover            | bigdecimal    | 必须 |     | 营业额   |      |
+| &emsp;\|-- unitPrice           | bigdecimal     | 必须 |     | 平均客单价 |      |
+| &emsp;\|-- validOrderCount     | integet     | 必须 |     | 有效订单数 |      | |
+
+- 订单管理接口
+
+（1）基本信息
+- path：/admin/workspace/overviewOrders
+- method：GET
+
+（2）返回数据
+
+| 名称                         | 类型         | 是否必须 | 默认值 | 备注    | 其他信息 |
+|----------------------------|------------|-----|-----|-------|------|
+| code                       | integer    | 必须  |     | 状态码   |      |
+| msg                        | string     | 非必须 |     | 错误信息  |   |
+| data                       | object     | 非必须  |     | 返回数据  |      |
+| &emsp;\|-- allOrders       | integer    | 必须 |     | 全部订单  |      |
+| &emsp;\|-- cancelledOrders | integet | 必须 |     | 已取消数量 |      |
+| &emsp;\|-- completedOrders | integet    | 必须 |     | 已完成数量 |      |
+| &emsp;\|-- deliveredOrders | integet     | 必须 |     | 待派送数量 |      |
+| &emsp;\|-- waitingOrders   | integet     | 必须 |     | 待接单数量 |      | |
+
+- 菜品总览接口
+
+（1）基本信息
+- path：/admin/workspace/overviewDishes
+- method：GET
+
+（2）返回数据
+
+| 名称                      | 类型         | 是否必须 | 默认值 | 备注      | 其他信息 |
+|-------------------------|------------|-----|-----|---------|------|
+| code                    | integer    | 必须  |     | 状态码     |      |
+| msg                     | string     | 非必须 |     | 错误信息    |   |
+| data                    | object     | 非必须  |     | 返回数据    |      |
+| &emsp;\|-- discontinued | integer    | 必须 |     | 已停售菜品数量 |      |
+| &emsp;\|-- sold         | integet | 必须 |     | 已起售菜品数量 |      |
+
+- 套餐总览接口
+
+（1）基本信息
+- path：/admin/workspace/overviewSetmeals
+- method：GET
+
+（2）返回数据
+
+| 名称                      | 类型         | 是否必须 | 默认值 | 备注      | 其他信息 |
+|-------------------------|------------|-----|-----|---------|------|
+| code                    | integer    | 必须  |     | 状态码     |      |
+| msg                     | string     | 非必须 |     | 错误信息    |   |
+| data                    | object     | 非必须  |     | 返回数据    |      |
+| &emsp;\|-- discontinued | integer    | 必须 |     | 已停售套餐数量 |      |
+| &emsp;\|-- sold         | integet | 必须 |     | 已起售套餐数量 |      |
+
+- 订单搜索（已完成）
+
+</details>
