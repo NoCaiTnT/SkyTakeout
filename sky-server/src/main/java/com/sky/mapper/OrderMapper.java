@@ -70,4 +70,14 @@ public interface OrderMapper {
      * @return
      */
     Double sumByMap(Map map);
+
+    /**
+     * 根据动态条件查询订单数量
+     * @param map
+     *      begin 开始时间
+     *      end 结束时间
+     *      status 订单状态
+     * @return
+     */
+    Integer countByMap(Map map);
 }
