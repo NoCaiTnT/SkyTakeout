@@ -6,15 +6,20 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,6 +38,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 获取指定时间范围内的所有日期
@@ -199,5 +207,74 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(StringUtils.join(nameList, ","))
                 .numberList(StringUtils.join(numberList, ","))
                 .build();
+    }
+
+    /**
+     * 导出营业数据
+     * @param response
+     */
+    public void exportBusinessData(HttpServletResponse response) {
+        // 查询最近 30 天的运营数据
+        LocalDate beginDate = LocalDate.now().minusDays(30);
+        LocalDate endDate = LocalDate.now().minusDays(1);
+        BusinessDataVO businessData = workspaceService.getBusinessData(LocalDateTime.of(beginDate, LocalTime.MIN),
+                                                                       LocalDateTime.of(endDate, LocalTime.MAX));
+
+        // 通过 POI 写入 Excel 文件
+        // 获取模板文件输入流
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+
+        try {
+            // 基于模板文件创建新的 Excel 文件
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+
+            // 获取 sheet 页
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            // 填充数据：时间
+            sheet.getRow(1).getCell(1).setCellValue("时间：" + beginDate + " - " + endDate);
+
+            // 获取第 4 行
+            XSSFRow row = sheet.getRow(3);
+
+            // 填充数据：营业额、订单完成率、新增用户数
+            row.getCell(2).setCellValue(businessData.getTurnover());
+            row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessData.getNewUsers());
+
+            // 获取第 5 行
+            row = sheet.getRow(4);
+
+            // 填充数据：有效订单、平均客单价
+            row.getCell(2).setCellValue(businessData.getValidOrderCount());
+            row.getCell(4).setCellValue(businessData.getUnitPrice());
+
+            // 循环获得 30 天的数据
+            LocalDate date = beginDate;
+            for (int i = 0; i < 30; i++) {
+                date = beginDate.plusDays(i);
+                // 查询这一天的运营数据
+                BusinessDataVO tempData = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN),
+                                                                      LocalDateTime.of(date, LocalTime.MAX));
+                row = sheet.getRow(7 + i);
+                row.getCell(1).setCellValue(date.toString());
+                row.getCell(2).setCellValue(tempData.getTurnover());
+                row.getCell(3).setCellValue(tempData.getValidOrderCount());
+                row.getCell(4).setCellValue(tempData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(tempData.getUnitPrice());
+                row.getCell(6).setCellValue(tempData.getNewUsers());
+            }
+
+            // 使用输出流将 Excel 文件下载到客户端浏览器
+            ServletOutputStream outputStream = response.getOutputStream();
+            workbook.write(outputStream);
+
+            // 关闭资源
+            workbook.close();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

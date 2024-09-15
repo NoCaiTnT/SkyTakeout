@@ -350,6 +350,83 @@ Apache ECharts 是一款基于 JS 的数据可视化图表库，提供直观、�
 
 </details>
 
+## Apache POI
+Apache POI 是一个基于微软各种文件格式的开源项目，可以使用 POI 在 Java 程序中对微软的各种文件进行读写操作
+- 一般情况下， POI 都是用于操作 Excel
+
+<details>
+
+<summary> 1. 应用场景 </summary>
+
+- 银行网银系统导出交易明细
+- 各种业务系统导出 Excel 报表
+- 批量导入业务数据
+
+</details>
+
+<details>
+
+<summary> 2. 入门案例 </summary>
+
+- 写入
+  - 创建一个 Excel 文件
+  - 创建一个工作表
+  - 创建一行，从 0 开始
+  - 创建一个单元格，从 0 开始
+  - 设置单元格的值
+  - 写入到文件中
+  - 关闭资源
+```
+// 在 内存 中创建一个 Excel 文件
+XSSFWorkbook workbook = new XSSFWorkbook();
+// 创建一个工作表
+XSSFSheet sheet = workbook.createSheet("info");
+// 创建一行
+XSSFRow row = sheet.createRow(0);
+// 创建一个单元格
+row.createCell(0).setCellValue("姓名");
+// 写入到文件
+// FileOutputStream fos = new FileOutputStream("D:/info.xlsx");
+FileOutputStream fos = new FileOutputStream(new File("D:/info.xlsx"));   // 创建文件
+workbook.write(fos);
+// 关闭资源
+fos.close;
+workbook.close();
+```
+
+- 读取
+  - 读取磁盘文件
+  - 读取 Excel 文件
+  - 读取工作表
+  - 读取有文字的最后一行，从 0 开始
+  - 从头读取每一行
+  - 读取单元格的值
+  - 关闭资源
+```
+// 读取磁盘文件
+FileInputStream fis = new FileInputStream(new File("D:/info.xlsx"));
+// 读取 Excel 文件
+XSSFWorkbook workbook = new XSSFWorkbook(fis);
+// 读取工作表
+XSSFSheet sheet = workbook.getSheetAt(0);
+// 读取有文字的最后一行
+int lastRowNum = sheet.getLastRowNum();
+// 从头读取每一行
+for (int i = 0; i <= lastRowNum; i++) {
+    // 获得每一行 
+    XSSFRow row = sheet.getRow(i);
+    // 获得每一个单元格
+    XSSFCell cell = row.getCell(0);
+    String value = cell.getStringCellValue();
+    System.out.println(value);
+}
+// 关闭资源
+fis.close();
+workbook.close();
+```
+
+</details>
+
 ## 需求分析
 <details>
 <summary>1. JWT令牌</summary>
@@ -2424,5 +2501,32 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 | &emsp;\|-- sold         | integet | 必须 |     | 已起售套餐数量 |      |
 
 - 订单搜索（已完成）
+
+</details>
+
+<details>
+
+<summary> 34. 工作台 </summary>
+
+1. 需求分析
+
+- 数据导出：以 Excel 文件导出最近 30 日的运营数据报表
+- 概览数据：营业额、有效订单、订单完成率、平均客单价、新增用户数
+- 明细数据：日期、营业额、有效订单、订单完成率、平均客单价、新增用户数
+
+2. 接口设计
+
+- path：/admin/report/export
+- method：GET
+- 后台自动计算日期
+- 通过输出流将 Excel 下载到浏览器
+
+3. 实现步骤
+
+- 创建模板报表文件
+- 查询近 30 天的运营数据
+- 将数据写入模板
+- 通过输出流将 Excel 文件下载到客户端浏览器
+  - 需要 HttpServletResponse 参数来将数据写入输出流
 
 </details>
