@@ -335,6 +335,21 @@ HTTP 与 WebSocket的区别
 
 </details>
 
+## Apache ECharts
+Apache ECharts 是一款基于 JS 的数据可视化图表库，提供直观、生动、可交互、可个性化定制的数据可视化图表，官方网址：https://echarts.apache.org/zh/index.html
+
+<details>
+
+<summary> 1. 入门案例 </summary>
+
+- 获取 echarts 的 js 文件：https://www.jsdelivr.com/package/npm/echarts?tab=files&path=dist
+- 下载 dist/echarts.js
+- 在 html 中引入 Apache ECharts：\<script src="echarts.js">\</script>
+- 使用 div 标签创建一个图表容器，在里面编写代码
+- 可以参考官方示例：https://echarts.apache.org/handbook/zh/get-started/#%E5%BC%95%E5%85%A5-apache-echarts
+
+</details>
+
 ## 需求分析
 <details>
 <summary>1. JWT令牌</summary>
@@ -2101,7 +2116,6 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 </details>
 
-
 <details>
 
 <summary> 29. 客户催单 </summary>
@@ -2140,11 +2154,55 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 3. 具体实现
 - 通过 WebSocket 实现管理端页面和服务端的长连接
 - 客户点击催单按钮后，调用 WebSocket 的相关 API 实现服务端想管理端推送消息
-  - 
+  - 定义催单接口，小程序向服务端发送催单消息
+  - 服务端使用 WebSocket 向商家端发送消息
 - 管理端浏览器解析消息，判断来单提醒还是客户催单，进行相应的提示和语音播报
 - 服务端给管理端的数据格式：JSON
   - type：消息类型，1为来单提醒，2为客户催单
   - orderId：订单 id
   - content：消息内容
+
+</details>
+
+<details>
+
+<summary> 30. 营业额统计 </summary>
+
+1. 需求分析
+
+- 营业额：订单状态为已完成的订单金额合计
+- X轴：日期 
+- Y轴：营业额
+- 根据时间选择器，展示昨天、近 7 日、近 30 日、本周、本月的营业额数据
+
+2. 接口设计
+
+（1）基本信息
+- path：/admin/report/turnoverStatistics
+- method：GET
+
+（2）请求参数
+- Query
+
+| 名称    | 类型      | 是否必须 | 默认值 | 备注   | 其他信息 |
+|-------|---------|-----|-----|------|------|
+| begin | string | 必须  |     | 开始日期 |      |
+| end   | string | 必须  |     | 结束日期 |      |
+
+（3）返回数据
+
+| 名称                      | 类型      | 是否必须 | 默认值 | 备注                 | 其他信息 |
+|-------------------------|---------|-----|-----|--------------------|------|
+| code                    | integer | 必须  |     | 状态码                |      |
+| msg                     | string  | 非必须 |     | 错误信息               |   |
+| data                    | object  | 非必须  |     | 返回数据               |      |
+| &emsp;\|-- dateList     | string | 必须 |     | 日期列表，以逗号分隔的字符串     |      |
+| &emsp;\|-- turnoverList | string | 必须 |     | 对应的营业额列表，以逗号分隔的字符串 |      |
+
+3. 具体实现
+- 在 admin 下新增 ReportController
+- 新增 ReportService 和 对应的 ReportServiceImpl
+  - 可以使用 @RequestParam("begin") 指定 query 参数对应的值
+- 若这一天没有订单，查询数据库返回的是空值，需要进行特殊处理
 
 </details>
