@@ -2506,7 +2506,7 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 
 <details>
 
-<summary> 34. 工作台 </summary>
+<summary> 35. 导出运营数据 </summary>
 
 1. 需求分析
 
@@ -2526,7 +2526,9 @@ ThreadLocal：为每个线程单独提供一份存储空间，每个线程都可
 - 创建模板报表文件
 - 查询近 30 天的运营数据
 - 将数据写入模板
+  - 使用 Apache POI
 - 通过输出流将 Excel 文件下载到客户端浏览器
-  - 需要 HttpServletResponse 参数来将数据写入输出流
+  - 需要 HttpServletResponse 获取输出流
+  - 然后将 Excel 文件写入该输出流
 
 </details>
