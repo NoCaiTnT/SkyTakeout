@@ -2,8 +2,10 @@ package com.sky.service.impl;
 
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,28 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    /**
+     * 获取指定时间范围内的所有日期
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+        // 当前集合用于存放从开始到结束范围内的每天的日期
+        List<LocalDate> dateList = new ArrayList<>();
+
+        // 计算日期
+        while (!startDate.isAfter(endDate)) {
+            dateList.add(startDate);
+            startDate = startDate.plusDays(1);
+        }
+
+        return dateList;
+    }
+
     /**
      * 统计指定时间区间内的营业额数据
      * @param startTime
@@ -32,13 +56,7 @@ public class ReportServiceImpl implements ReportService {
      */
     public TurnoverReportVO turnoverStatistics(LocalDate startTime, LocalDate endTime) {
         // 当前集合用于存放从开始到结束范围内的每天的日期
-        List<LocalDate> dateList = new ArrayList<>();
-
-        // 计算日期
-        while (!startTime.isAfter(endTime)) {
-            dateList.add(startTime);
-            startTime = startTime.plusDays(1);
-        }
+        List<LocalDate> dateList = getDatesBetween(startTime, endTime);
 
         // 查询营业额数据
         List<Double> turnoverList = new ArrayList<>();
@@ -62,5 +80,43 @@ public class ReportServiceImpl implements ReportService {
                 .turnoverList(StringUtils.join(turnoverList, ","))
                 .build();
         return  turnoverReportVO;
+    }
+
+    /**
+     * 统计指定时间区间内的用户数据
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public UserReportVO userStatistics(LocalDate startTime, LocalDate endTime) {
+        // 当前集合用于存放从开始到结束范围内的每天的日期
+        List<LocalDate> dateList = getDatesBetween(startTime, endTime);
+
+        // 获取每天的新增用户数
+        List<Integer> newUserList = new ArrayList<>();
+        // 获取每天的总用户数
+        List<Integer> totalUserList = new ArrayList<>();
+
+        for (LocalDate date : dateList) {
+            LocalDateTime begin = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime end = LocalDateTime.of(date, LocalTime.MAX);
+            // 查询每天的用户总量
+            Map map = new HashMap();
+            map.put("end", end);
+            Integer totalUser = userMapper.countByMap(map);
+
+            // 查询每天的新增用户量
+            map.put("begin", begin);
+            Integer newUser = userMapper.countByMap(map);
+
+            newUserList.add(newUser);
+            totalUserList.add(totalUser);
+        }
+
+        return UserReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .newUserList(StringUtils.join(newUserList, ","))
+                .totalUserList(StringUtils.join(totalUserList, ","))
+                .build();
     }
 }
